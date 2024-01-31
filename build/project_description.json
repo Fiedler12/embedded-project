@@ -1,7 +1,7 @@
 {
     "version":            "1",
     "project_name":       "embedded-project",
-    "project_version":    "1",
+    "project_version":    "223de1c-dirty",
     "project_path":       "C:/Repos/Embedded-systems-project/embedded-project",
     "idf_path":           "C:/Users/olyng/esp/esp-idf",
     "build_dir":          "C:/Repos/Embedded-systems-project/embedded-project/build",

@@ -53,20 +53,19 @@
 #define WIFI_CONNECTED_BIT BIT0
 #define WIFI_FAIL_BIT      BIT1
 
-#define EXAMPLE_LCD_PIXEL_CLOCK_HZ    (400 * 1000)
-#define EXAMPLE_I2C_HW_ADDR           0x3C
-
-#define EXAMPLE_LCD_H_RES              128
-#define EXAMPLE_LCD_V_RES              64
-
-#define EXAMPLE_LCD_CMD_BITS           8
-#define EXAMPLE_LCD_PARAM_BITS         8
-
 static const char *TAG = "wifi station";
 static int s_retry_num = 0;
 static esp_mqtt_client_handle_t client;
 
 static EventGroupHandle_t s_wifi_event_group;
+
+void init_mqtt() {
+esp_mqtt_client_config_t mqtt_cfg = {
+    .broker.address.uri = MQTT_BROKER
+  };
+
+client = esp_mqtt_client_init(&mqtt_cfg);
+}
 
 static void event_handler(void* arg, esp_event_base_t event_base,
                                 int32_t event_id, void* event_data)
@@ -164,11 +163,6 @@ void wifi_init_sta(void)
 
 
 void send_mqtt(char* s, int size) {
-  esp_mqtt_client_config_t mqtt_cfg = {
-    .broker.address.uri = MQTT_BROKER
-  };
-
-  client = esp_mqtt_client_init(&mqtt_cfg);
 
   esp_err_t err = esp_mqtt_client_start(client);
 
@@ -213,6 +207,7 @@ void prepare_mqtt_packet(struct Ring_buffer *buffer, char *s);
 void app_main() {
   esp_err_t ret = nvs_flash_init();
   wifi_init_sta();
+  init_mqtt();
   adc_oneshot_unit_handle_t handle;
   adc_oneshot_unit_init_cfg_t adc_config = {.unit_id = ADC_UNIT_1};
   i2c_port_t i2c_port;
@@ -255,7 +250,7 @@ void fillSample(struct Sample *s, i2c_port_t i2c_port, adc_oneshot_unit_handle_t
   if (err != ESP_OK) {
     printf("ADC failed\n");
   }
-  //ChangeLight(&s->moisture);
+  ChangeLight(&s->moisture);
 }
 
 void prepare_mqtt_packet(struct Ring_buffer *buffer, char *s) {
